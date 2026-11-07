@@ -28,7 +28,7 @@ export const LINES = [
     name: "my Archive",
     hint: "OMy_lib",
     probeUrl:
-      "https://zh.z-library.im/",
+      "https://z-library.im/",
   },
 ];
 
