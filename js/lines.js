@@ -15,20 +15,13 @@ export const LINES = [
     probeUrl: "https://openlibrary.org/search.json?q=pride&limit=1",
   },
   {
-    id: "archive",
+    id: "library",
     label: "线路 3",
-    name: "Internet Archive",
-    hint: "互联网档案馆",
-    probeUrl:
-      "https://archive.org/advancedsearch.php?q=mediatype:texts&fl[]=identifier&rows=1&page=1&output=json",
-  },
-    {
-    id: "mylib",
-    label: "线路 4",
-    name: "my Archive",
-    hint: "OMy_lib",
-    probeUrl:
-      "https://z-library.im/",
+    name: "Library Redirect",
+    hint: "自动跳转到最新可用网址",
+    probeUrl: "https://library-redirect.sk/",
+    siteUrl: "https://library-redirect.sk/",
+    external: true,
   },
 ];
 
@@ -45,14 +38,40 @@ export async function probeLine(line, timeoutMs = 4500) {
       method: "GET",
       signal: controller.signal,
       cache: "no-store",
-      mode: "cors",
+      // 外部跳转线路没有跨域响应头，只能用 no-cors 判断可达性
+      mode: line.external ? "no-cors" : "cors",
     });
     const ms = Math.round(performance.now() - started);
+    if (line.external) return { id: line.id, latencyMs: ms };
     if (!res.ok) return { id: line.id, latencyMs: -1 };
     await res.text().catch(() => "");
     return { id: line.id, latencyMs: ms };
   } catch {
     return { id: line.id, latencyMs: -1 };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** 解析跳转线路的入口地址，跟随重定向得到最新网址（解析失败时回退到入口地址）。 */
+export async function resolveLineUrl(line, timeoutMs = 6000) {
+  const entry = line?.siteUrl || line?.probeUrl;
+  if (!entry) return null;
+  if (!line.external) return entry;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(entry, {
+      method: "GET",
+      signal: controller.signal,
+      cache: "no-store",
+      redirect: "follow",
+      mode: "cors",
+    });
+    return res.url || entry;
+  } catch {
+    return entry;
   } finally {
     clearTimeout(timer);
   }

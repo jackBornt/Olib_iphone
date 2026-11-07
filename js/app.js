@@ -5,6 +5,7 @@ import {
   getLine,
   latencyTone,
   probeAllLines,
+  resolveLineUrl,
 } from "./lines.js";
 import {
   clearRecent,
@@ -58,6 +59,11 @@ const els = {
   settingLineLabel: document.getElementById("setting-line-label"),
   settingLineMeta: document.getElementById("setting-line-meta"),
   openLinePicker: document.getElementById("open-line-picker"),
+  lineSiteCard: document.getElementById("line-site-card"),
+  lineSiteTitle: document.getElementById("line-site-title"),
+  lineSiteUrl: document.getElementById("line-site-url"),
+  lineSiteOpen: document.getElementById("line-site-open"),
+  lineSiteRefresh: document.getElementById("line-site-refresh"),
 };
 
 const state = {
@@ -69,6 +75,7 @@ const state = {
   loading: false,
   testing: false,
   latencies: getLatencies(),
+  siteUrls: {},
 };
 
 function setStatus(text, isError = false) {
@@ -155,7 +162,48 @@ async function runSpeedTest() {
   }
 }
 
+async function refreshLineSite(line = getLine(getActiveLineId())) {
+  if (!line.external) {
+    els.lineSiteCard.hidden = true;
+    return null;
+  }
+
+  const entry = line.siteUrl || line.probeUrl;
+  els.lineSiteCard.hidden = false;
+  els.lineSiteTitle.textContent = `${line.label} · ${line.name}`;
+
+  const cached = state.siteUrls[line.id];
+  if (cached) {
+    els.lineSiteUrl.textContent = cached;
+    els.lineSiteOpen.dataset.url = cached;
+    return cached;
+  }
+
+  els.lineSiteUrl.textContent = "正在解析最新网址…";
+  els.lineSiteOpen.dataset.url = entry;
+
+  const url = (await resolveLineUrl(line)) || entry;
+  state.siteUrls[line.id] = url;
+  // 解析是异步的，期间用户可能已切到别的线路
+  if (getActiveLineId() === line.id) {
+    els.lineSiteUrl.textContent = url;
+    els.lineSiteOpen.dataset.url = url;
+  }
+  return url;
+}
+
 async function selectLine(lineId) {
+  const line = getLine(lineId);
+  if (line.external) {
+    setActiveLineId(line.id);
+    refreshLineSummary();
+    renderLineList();
+    els.lineDialog.close();
+    switchView("home");
+    refreshLineSite(line);
+    loadBooks({ query: state.query, page: 1 });
+    return;
+  }
   if (lineId === getActiveLineId()) {
     els.lineDialog.close();
     return;
@@ -165,6 +213,7 @@ async function selectLine(lineId) {
   renderLineList();
   els.lineDialog.close();
   switchView("home");
+  refreshLineSite(line);
   await loadBooks({ query: state.query, page: 1 });
 }
 
@@ -236,9 +285,23 @@ function updatePager() {
 async function loadBooks({ query = state.query, page = 1 } = {}) {
   const settings = getSettings();
   const line = getLine(settings.lineId);
-  state.loading = true;
   state.query = query;
   state.page = page;
+
+  if (line.external) {
+    state.books = [];
+    state.next = null;
+    state.previous = null;
+    renderBooks(els.grid, []);
+    updatePager();
+    els.title.textContent = query ? `搜索「${query}」` : "热门推荐";
+    els.meta.textContent = `${line.label} · ${line.name}`;
+    setStatus(`${line.label} 是跳转线路，上方显示的是最新站点地址，点「打开站点」即可前往；应用内搜索请切换其他线路。`);
+    refreshLineSite(line);
+    return;
+  }
+
+  state.loading = true;
   updatePager();
   setStatus(`正在从 ${line.name} 加载…`);
 
@@ -466,6 +529,16 @@ els.lineList?.addEventListener("click", (event) => {
   const item = event.target.closest("[data-line]");
   if (!item) return;
   selectLine(item.dataset.line);
+});
+
+els.lineSiteOpen?.addEventListener("click", () => {
+  const url = els.lineSiteOpen.dataset.url;
+  if (url) window.open(url, "_blank", "noopener,noreferrer");
+});
+
+els.lineSiteRefresh?.addEventListener("click", () => {
+  delete state.siteUrls[getActiveLineId()];
+  refreshLineSite();
 });
 
 if ("serviceWorker" in navigator) {

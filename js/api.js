@@ -190,9 +190,6 @@ export async function fetchBooks({
   if (source === "archive") {
     return fetchArchive({ query, page, pageSize });
   }
-  if(source === "mylib"){
-	return fetchMyLib({query,page,pageSize});
-  }
   return fetchGutendex({ query, page, lang, pageSize });
 }
 

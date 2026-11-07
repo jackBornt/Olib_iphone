@@ -252,6 +252,44 @@ body {
   color: #9b2c2c;
 }
 
+.line-site-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.line-site-card[hidden] {
+  display: none;
+}
+
+.line-site-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.line-site-url {
+  margin: 4px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--teal-deep);
+  word-break: break-all;
+}
+
+.line-site-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .book-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));

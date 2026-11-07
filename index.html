@@ -54,7 +54,7 @@
         <div class="hero">
           <h1>搜书，并一键切换可用线路</h1>
           <p class="hero-copy">
-            参考 Olib 的多线路体验：可测速、切换 Gutenberg / Open Library / Internet Archive。仅面向公开可访问书源。
+            参考 Olib 的多线路体验：可测速、切换 Gutenberg / Open Library / Library Redirect。仅面向公开可访问书源。
           </p>
           <form id="search-form" class="search-bar" autocomplete="off">
             <label class="sr-only" for="search-input">搜索书名或作者</label>
@@ -74,6 +74,16 @@
         <div class="section-head">
           <h2 id="results-title">热门推荐</h2>
           <p id="results-meta" class="muted">按当前线路排序</p>
+        </div>
+        <div id="line-site-card" class="line-site-card" hidden>
+          <div>
+            <p id="line-site-title" class="line-site-title">Library Redirect</p>
+            <p id="line-site-url" class="line-site-url">—</p>
+          </div>
+          <div class="line-site-actions">
+            <button id="line-site-open" class="btn primary" type="button">打开站点</button>
+            <button id="line-site-refresh" class="btn ghost" type="button">重新解析</button>
+          </div>
         </div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
         <div id="book-grid" class="book-grid"></div>

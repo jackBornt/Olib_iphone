@@ -1,4 +1,4 @@
-const CACHE = "olib-pwa-v2";
+const CACHE = "olib-pwa-v3";
 const PRECACHE = [
   "./",
   "./index.html",
