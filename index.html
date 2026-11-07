@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#2D6A4F" />
+    <meta name="description" content="Olib PWA — 多线路公有书源搜索，可安装到 iPhone 主屏幕" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Olib" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <title>Olib</title>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <p class="brand-name">Olib</p>
+          <p class="brand-tag">多线路公有书架</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="line-btn" class="line-chip" type="button" title="切换线路">
+          <span class="line-chip-icon" aria-hidden="true">◎</span>
+          <span id="line-label">线路 1</span>
+          <span class="dot" id="line-dot" data-tone="muted"></span>
+          <span id="line-latency" class="line-chip-ms">测速中</span>
+        </button>
+        <nav class="tabs" role="tablist" aria-label="主导航">
+          <button class="tab is-active" data-view="home" role="tab" aria-selected="true">发现</button>
+          <button class="tab" data-view="shelf" role="tab" aria-selected="false">书架</button>
+          <button class="tab" data-view="settings" role="tab" aria-selected="false">设置</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="view-home" class="view is-active" role="tabpanel">
+        <div class="hero">
+          <h1>搜书，并一键切换可用线路</h1>
+          <p class="hero-copy">
+            参考 Olib 的多线路体验：可测速、切换 Gutenberg / Open Library / Internet Archive。仅面向公开可访问书源。
+          </p>
+          <form id="search-form" class="search-bar" autocomplete="off">
+            <label class="sr-only" for="search-input">搜索书名或作者</label>
+            <input
+              id="search-input"
+              name="q"
+              type="search"
+              enterkeyhint="search"
+              placeholder="书名、作者、关键词…"
+              required
+            />
+            <button type="submit" class="btn primary">搜索</button>
+          </form>
+          <div class="chip-row" id="recent-chips" hidden></div>
+        </div>
+
+        <div class="section-head">
+          <h2 id="results-title">热门推荐</h2>
+          <p id="results-meta" class="muted">按当前线路排序</p>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+        <div id="book-grid" class="book-grid"></div>
+        <div class="pager">
+          <button id="prev-page" class="btn ghost" type="button" hidden>上一页</button>
+          <button id="next-page" class="btn ghost" type="button" hidden>下一页</button>
+        </div>
+      </section>
+
+      <section id="view-shelf" class="view" role="tabpanel" hidden>
+        <div class="section-head">
+          <h2>我的书架</h2>
+          <p class="muted">收藏保存在本机，不会上传</p>
+        </div>
+        <div id="shelf-empty" class="empty" hidden>
+          <p>还没有收藏。在发现页点书脊上的星标即可加入。</p>
+        </div>
+        <div id="shelf-grid" class="book-grid"></div>
+      </section>
+
+      <section id="view-settings" class="view" role="tabpanel" hidden>
+        <div class="section-head">
+          <h2>设置</h2>
+          <p class="muted">偏好会记在浏览器本地存储里</p>
+        </div>
+
+        <div class="panel">
+          <h3>网络线路</h3>
+          <button id="open-line-picker" class="line-setting" type="button">
+            <span>
+              <strong id="setting-line-label">线路 1 · Project Gutenberg</strong>
+              <span id="setting-line-meta" class="muted small">公有领域 · Gutendex</span>
+            </span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </button>
+          <p class="muted small" style="margin-top:10px">
+            界面参考 Olib 的「多线路」交互；书源为合法公开接口，不连接任何盗版镜像。
+          </p>
+        </div>
+
+        <div class="panel">
+          <label class="field">
+            <span>优先语言</span>
+            <select id="setting-lang">
+              <option value="">不限</option>
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Português</option>
+              <option value="ru">Русский</option>
+              <option value="ja">日本語</option>
+            </select>
+          </label>
+
+          <label class="field checkbox">
+            <input type="checkbox" id="setting-cover" checked />
+            <span>显示封面图</span>
+          </label>
+
+          <label class="field">
+            <span>每页数量</span>
+            <select id="setting-page-size">
+              <option value="12">12</option>
+              <option value="24" selected>24</option>
+              <option value="32">32</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="panel">
+          <h3>安装到 iPhone</h3>
+          <ol class="install-steps">
+            <li>用 <strong>Safari</strong> 打开本站（需 https 或局域网地址）</li>
+            <li>点底部分享按钮</li>
+            <li>选择「添加到主屏幕」</li>
+            <li>确认后即可像 App 一样全屏打开</li>
+          </ol>
+          <p class="muted small">
+            Windows 测试：运行 <code>npm run windows</code> 会打开独立应用窗口。
+          </p>
+        </div>
+
+        <div class="panel danger-zone">
+          <button id="clear-recent" class="btn ghost" type="button">清空搜索历史</button>
+          <button id="clear-shelf" class="btn ghost danger" type="button">清空书架</button>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="line-dialog" class="line-dialog">
+      <header class="line-dialog-head">
+        <div>
+          <h2>选择线路</h2>
+          <p class="muted small">测速后选择延迟更低的线路</p>
+        </div>
+        <button id="line-test" class="btn ghost" type="button">重新测速</button>
+      </header>
+      <div id="line-list" class="line-list"></div>
+      <form method="dialog" class="dialog-actions">
+        <button id="line-close" class="btn ghost" value="close">关闭</button>
+      </form>
+    </dialog>
+
+    <dialog id="book-dialog" class="book-dialog">
+      <article id="book-detail"></article>
+      <form method="dialog" class="dialog-actions">
+        <button class="btn ghost" value="close">关闭</button>
+      </form>
+    </dialog>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
