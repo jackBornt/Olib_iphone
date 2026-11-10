@@ -722,6 +722,10 @@ body {
   display: grid;
   gap: 8px;
   padding: 8px 14px 4px;
+  max-height: min(58vh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .line-item {
@@ -796,4 +800,183 @@ code {
   .tabs {
     margin-left: auto;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* 置顶网址 · 多线路扩展                                               */
+/* ------------------------------------------------------------------ */
+
+.pinned-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--teal) 26%, var(--line));
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--teal-soft) 88%, white), var(--paper));
+  box-shadow: var(--shadow);
+}
+
+.pinned-banner[hidden] {
+  display: none;
+}
+
+.pinned-body {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.pinned-label {
+  margin: 0 0 3px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  color: var(--teal-deep);
+}
+
+.pinned-url {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--teal-deep);
+  word-break: break-all;
+}
+
+.pinned-meta {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.pinned-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pinned-setting-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.pinned-setting-row code {
+  word-break: break-all;
+}
+
+.line-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: middle;
+  color: var(--teal-deep);
+  background: var(--teal-soft);
+}
+
+.line-badge-custom {
+  color: #8a5a2b;
+  background: #fdf1e3;
+}
+
+.line-pin-btn {
+  border: 0;
+  background: transparent;
+  color: #c2cfc8;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.line-pin-btn.is-on {
+  color: var(--gold);
+}
+
+.line-pin-btn:hover {
+  color: var(--teal);
+}
+
+.line-site-copy {
+  min-width: 0;
+}
+
+.line-site-hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.custom-line-list {
+  display: grid;
+  gap: 0;
+}
+
+.custom-line-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.custom-line-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.custom-line-info strong {
+  font-size: 0.95rem;
+}
+
+.custom-line-info .muted {
+  word-break: break-all;
+}
+
+.custom-line-form {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.field input {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: white;
+}
+
+.field input:focus {
+  outline: 2px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  outline-offset: 1px;
+}
+
+.line-group-title {
+  margin: 10px 0 2px;
+  padding: 2px 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.line-group-title:first-child {
+  margin-top: 2px;
+}
+
+.line-online-count {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
 }

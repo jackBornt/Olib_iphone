@@ -1,7 +1,7 @@
 {
   "name": "Olib",
   "short_name": "Olib",
-  "description": "多线路公有书源搜索 PWA（Gutenberg / Open Library / Internet Archive）",
+  "description": "Olib 多线路 PWA：41 条镜像线路（可切换登录）+ Gutenberg / Open Library / Internet Archive 公有书源，支持置顶网址",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

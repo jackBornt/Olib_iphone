@@ -3,6 +3,7 @@ const KEYS = {
   shelf: "olib.shelf",
   recent: "olib.recent",
   latencies: "olib.latencies",
+  customLines: "olib.customLines",
 };
 
 const defaultSettings = {
@@ -10,6 +11,8 @@ const defaultSettings = {
   showCover: true,
   pageSize: 24,
   lineId: "gutenberg",
+  // 「置顶网址」默认指向 Olib 的默认镜像线路；该线路不可用时回退到最快在线镜像。
+  pinnedLineId: "mirror:bookroom.lifestyle",
 };
 
 function read(key, fallback) {
@@ -99,4 +102,77 @@ export function pushRecent(query) {
 
 export function clearRecent() {
   write(KEYS.recent, []);
+}
+
+/* ------------------------------------------------------------------ */
+/* 自定义线路（多线路扩展，仅存本机）                                  */
+/* ------------------------------------------------------------------ */
+
+function normalizeUrl(raw) {
+  const value = String(raw || "").trim();
+  if (!value) return "";
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+export function getCustomLines() {
+  const list = read(KEYS.customLines, []);
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter(
+      (line) =>
+        line &&
+        typeof line.id === "string" &&
+        line.name &&
+        (line.searchUrl || line.siteUrl),
+    )
+    .map((line) => ({
+      ...line,
+      kind: "mirror",
+      custom: true,
+      external: true,
+      hint: line.hint || "自定义镜像线路 · 跳转搜索",
+    }));
+}
+
+export function saveCustomLines(lines) {
+  const next = Array.isArray(lines) ? lines : [];
+  write(KEYS.customLines, next);
+  return next;
+}
+
+export function addCustomLine({ name, searchUrl, pinnedUrl }) {
+  const lines = getCustomLines();
+  const trimmedSearch = String(searchUrl || "").trim();
+  const base =
+    normalizeUrl(pinnedUrl) ||
+    normalizeUrl(trimmedSearch.split("{q}")[0]) ||
+    "";
+  const id = `custom:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const line = {
+    id,
+    kind: "mirror",
+    custom: true,
+    external: true,
+    name: String(name || "").trim().slice(0, 40) || "自定义线路",
+    hint: "自定义镜像线路 · 跳转搜索",
+    searchUrl: trimmedSearch,
+    siteUrl: base,
+    pinnedUrl: normalizeUrl(pinnedUrl) || base,
+    registrationPath: "",
+  };
+  lines.push(line);
+  saveCustomLines(lines);
+  return line;
+}
+
+export function removeCustomLine(id) {
+  const lines = getCustomLines().filter((line) => line.id !== id);
+  saveCustomLines(lines);
+  return lines;
 }

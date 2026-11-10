@@ -51,10 +51,22 @@
 
     <main>
       <section id="view-home" class="view is-active" role="tabpanel">
+        <section id="pinned-banner" class="pinned-banner" aria-label="置顶网址" hidden>
+          <div class="pinned-body">
+            <p class="pinned-label">📌 置顶网址</p>
+            <p id="pinned-url" class="pinned-url">正在发现最新可用网址…</p>
+            <p id="pinned-meta" class="pinned-meta">自动选择最快在线线路</p>
+          </div>
+          <div class="pinned-actions">
+            <button id="pinned-open" class="btn primary" type="button">打开置顶网址</button>
+            <button id="pinned-discover" class="btn ghost" type="button">发现新网址</button>
+          </div>
+        </section>
+
         <div class="hero">
           <h1>搜书，并一键切换可用线路</h1>
           <p class="hero-copy">
-            参考 Olib 的多线路体验：可测速、切换 Gutenberg / Open Library / Library Redirect。仅面向公开可访问书源。
+            参考 Olib 的多线路体验：内置 41 条 Olib 镜像线路（可切换登录 / 站内搜索）+ Gutenberg / Open Library / Internet Archive 公有书源；顶部「置顶网址」会自动选最快在线线路并解析最新地址。
           </p>
           <form id="search-form" class="search-bar" autocomplete="off">
             <label class="sr-only" for="search-input">搜索书名或作者</label>
@@ -76,12 +88,15 @@
           <p id="results-meta" class="muted">按当前线路排序</p>
         </div>
         <div id="line-site-card" class="line-site-card" hidden>
-          <div>
+          <div class="line-site-copy">
             <p id="line-site-title" class="line-site-title">Library Redirect</p>
             <p id="line-site-url" class="line-site-url">—</p>
+            <p id="line-site-hint" class="line-site-hint">跳转线路：打开后网站会自动跳转到最新地址。</p>
           </div>
           <div class="line-site-actions">
             <button id="line-site-open" class="btn primary" type="button">打开站点</button>
+            <button id="line-site-search" class="btn ghost" type="button" hidden>在站点搜索</button>
+            <button id="line-site-login" class="btn ghost" type="button" hidden>登录/注册</button>
             <button id="line-site-refresh" class="btn ghost" type="button">重新解析</button>
           </div>
         </div>
@@ -114,14 +129,53 @@
           <h3>网络线路</h3>
           <button id="open-line-picker" class="line-setting" type="button">
             <span>
-              <strong id="setting-line-label">线路 1 · Project Gutenberg</strong>
+              <strong id="setting-line-label">书源 1 · Project Gutenberg</strong>
               <span id="setting-line-meta" class="muted small">公有领域 · Gutendex</span>
             </span>
             <span class="chevron" aria-hidden="true">›</span>
           </button>
           <p class="muted small" style="margin-top:10px">
-            界面参考 Olib 的「多线路」交互；书源为合法公开接口，不连接任何盗版镜像。
+            界面参考 Olib 的「多线路」交互；镜像线路来自 Olib v1.4.0 线路表，均为公开入口，请遵守当地版权法规。
           </p>
+        </div>
+
+        <div class="panel">
+          <h3>置顶网址</h3>
+          <p class="muted small">
+            顶部公告会展示「置顶线路」的最新可用网址；置顶线路不可用时自动回退到延迟最低的在线镜像线路。
+          </p>
+          <label class="field">
+            <span>置顶线路</span>
+            <select id="setting-pinned-line"></select>
+          </label>
+          <div class="pinned-setting-row">
+            <code id="setting-pinned-url">尚未解析</code>
+            <button id="setting-pinned-open" class="btn ghost" type="button">打开</button>
+            <button id="setting-pinned-refresh" class="btn ghost" type="button">重新解析</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>自定义线路</h3>
+          <p class="muted small">
+            扩展更多镜像线路：搜索时会打开该站点的搜索页。配置只保存在本机，不会上传。
+          </p>
+          <div id="custom-line-list" class="custom-line-list"></div>
+          <form id="custom-line-form" class="custom-line-form" autocomplete="off">
+            <label class="field">
+              <span>线路名称</span>
+              <input id="custom-name" type="text" maxlength="40" placeholder="例如：我的书源" required />
+            </label>
+            <label class="field">
+              <span>搜索网址（用 <code>{q}</code> 代表关键词）</span>
+              <input id="custom-search" type="text" inputmode="url" placeholder="https://example.com/search?q={q}" required />
+            </label>
+            <label class="field">
+              <span>置顶/官网网址（可选）</span>
+              <input id="custom-pinned" type="text" inputmode="url" placeholder="https://example.com/" />
+            </label>
+            <button class="btn primary" type="submit">添加线路</button>
+          </form>
         </div>
 
         <div class="panel">
@@ -180,7 +234,8 @@
       <header class="line-dialog-head">
         <div>
           <h2>选择线路</h2>
-          <p class="muted small">测速后选择延迟更低的线路</p>
+          <p class="muted small">镜像线路可切换登录 / 站内搜索；公有书源可应用内搜索</p>
+          <p id="line-online-count" class="line-online-count">测速中…</p>
         </div>
         <button id="line-test" class="btn ghost" type="button">重新测速</button>
       </header>
